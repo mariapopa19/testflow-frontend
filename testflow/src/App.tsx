@@ -1,6 +1,7 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import logo from './assets/images/logo.svg';
+import './assets/styles/App.css';
+import GoogleAuth from './components/Login/GoogleAuth';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         >
           Learn React
         </a>
+        <GoogleAuth />
       </header>
     </div>
   );
