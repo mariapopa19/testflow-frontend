@@ -4,22 +4,30 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-
+import { BrowserRouter as Router } from 'react-router-dom';
+import { ThemeProvider } from './context/ThemeContext';
+import { AppWrapper } from './components/common/PageMeta';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,
 );
 root.render(
   <React.StrictMode>
-    <GoogleOAuthProvider
-      clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID ?? ''} // Ensure this is set in your .env file
-    >
-      <App />
-    </GoogleOAuthProvider>
+    <Router>
+      <ThemeProvider>
+        <AppWrapper>
+          <GoogleOAuthProvider
+            clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID ?? ''} // Ensure this is set in your .env file
+          >
+            <App />
+          </GoogleOAuthProvider>
+        </AppWrapper>
+      </ThemeProvider>
+    </Router>
   </React.StrictMode>,
 );
 
-console.log('Google Client ID:', process.env.REACT_APP_GOOGLE_CLIENT_ID);
+console.log('Google Client ID:', import.meta.env.VITE_GOOGLE_CLIENT_ID);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
