@@ -5,10 +5,30 @@ import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
+import { useGoogleLogin } from "@react-oauth/google";
+import { loginWithGoogle } from "../../services/authService";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+
+  const signInWithGoogle = useGoogleLogin({
+    onSuccess: (tokenResponse) => {
+      console.log(tokenResponse);
+      // loginWithGoogle(tokenResponse.access_token)
+      //   .then((response) => {
+      //     localStorage.setItem('access_token', response.token);
+      //     alert(`Welcome back, ${response.name}`);
+      //   })
+      //   .catch(() => {
+      //     console.error("Login failed");
+      //   });
+    },
+    onError: () => {
+      console.error("Login failed");
+    },
+  });
+
   return (
     <div className="flex flex-col flex-1">
       <div className="w-full max-w-md pt-10 mx-auto">
@@ -32,7 +52,8 @@ export default function SignInForm() {
           </div>
           <div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-5">
-              <button className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10">
+              <button className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10" 
+                onClick={() => signInWithGoogle()}>
                 <svg
                   width="20"
                   height="20"
