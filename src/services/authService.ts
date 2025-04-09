@@ -6,12 +6,20 @@ interface AuthResponse {
   name: string;
 }
 
-export const loginWithGoogle = async (idToken: string): Promise<AuthResponse> => {
-  const response = await api.post<AuthResponse>('/api/auth/google-login', { idToken });
+export const loginWithGoogle = async (
+  accessToken: string,
+): Promise<AuthResponse> => {
+  const response = await api.post<AuthResponse>('/api/auth/google-login', {
+    accessToken,
+  });
   return response.data;
 };
 
-export const registerWithGoogle = async (idToken: string): Promise<AuthResponse> => {
-  const response = await api.post<AuthResponse>('/api/auth/google-register', { idToken });
+export const registerWithGoogle = async (
+  accessToken: string,
+): Promise<AuthResponse> => {
+  const response = await api.post<AuthResponse>('/api/auth/google-register', {
+    accessToken,
+  });
   return response.data;
 };
