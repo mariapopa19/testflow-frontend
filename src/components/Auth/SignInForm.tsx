@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "../../assets/icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
@@ -11,12 +11,13 @@ import { loginWithGoogle } from "../../services/authService";
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const navigate = useNavigate();
 
   const handleGoogleLogin = async (token: string) => {
     try {
       const response = await loginWithGoogle(token);
-      localStorage.setItem("access_token", response.token);
-      alert(`Welcome back, ${response.name}`);
+      sessionStorage.setItem("access_token", response.token);
+      navigate("/endpoints");
     } catch (err) {
       console.error("Login failed", err);
     }
