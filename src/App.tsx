@@ -5,15 +5,18 @@ import SignUp from './pages/Authentication/SignUp';
 import Endpoints from './pages/Endpoints/Endpoints';
 import AppLayout from './layout/AppLayout';
 import PrivateRoutes from './components/routes/PrivateRoute';
+import AddEndpoint from './pages/Endpoints/AddEndpoint';
 
 function App() {
   return (
     <Routes>
-      <Route element={<PrivateRoutes />}>
+      {/*decomment this when you want to add security to your routes */}
+      {/* <Route element={<PrivateRoutes />}> */}
         <Route element={<AppLayout />}>
           <Route path="/endpoints" element={<Endpoints />} />
+          <Route path="/add-endpoint-form" element={<AddEndpoint />} />
         </Route>
-      </Route>
+      {/* </Route> */}
       <Route path="/" element={<SignUp />} />
       <Route path="/signin" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
