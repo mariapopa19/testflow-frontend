@@ -7,11 +7,15 @@ import Form from '../form/Form';
 import Button from '../ui/button/Button';
 import TextArea from '../form/input/TextArea';
 import { useNavigate } from 'react-router-dom';
+import { addEndpoint } from '../../services/endpointService';
 
 export default function AddEndpointForm() {
-  const [selectedOption, setSelectedOption] = useState<string>('Free');
+  const [selectedOption, setSelectedOption] = useState<string>('GET');
+  const [endpointName, setEndpointName] = useState<string>('');
+  const [endpointUrl, setEndpointUrl] = useState<string>('');
   const [requestBody, setRequestBody] = useState<string>('');
   const [responseBody, setResponseBody] = useState<string>('');
+
   const [errorRequest, setErrorRequest] = useState<boolean>(false); // State to track error
   const [errorResponse, setErrorResponse] = useState<boolean>(false); // State to track error
   const [errorUrl, setErrorUrl] = useState<boolean>(false); // State to track error
@@ -22,15 +26,34 @@ export default function AddEndpointForm() {
     navigate('/endpoints'); // Navigate to the desired route
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    let requestJson: string = '';
+    let responseJson: string = '';
+    if (requestBody !== '') {
+      requestJson = JSON.stringify(JSON.parse(requestBody));
+    }
+    if (responseBody !== '') {
+      responseJson = JSON.stringify(JSON.parse(responseBody));
+    }
+
     e.preventDefault();
-    console.log('Form submitted:');
+
+    try {
+      await addEndpoint({
+        name: endpointName,
+        httpMethod: selectedOption,
+        url: endpointUrl,
+        requestBodyModel: requestJson,
+        responseBodyModel: responseJson,
+      });
+      navigate('/endpoints');
+    } catch (error) {
+      console.error('Error adding endpoint:', error);
+    }
   };
 
   const handleUrlValidation = (url: string) => {
-    const expression =
-      /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
-    const regex = new RegExp(expression);
+    const regex = new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/);
     if (regex.test(url)) {
       setErrorUrl(false); // valid URL
     } else {
@@ -40,10 +63,10 @@ export default function AddEndpointForm() {
   };
 
   const endpointMethod = [
-    { value: 'get', label: 'GET' },
-    { value: 'post', label: 'POST' },
-    { value: 'put', label: 'PUT' },
-    { value: 'delete', label: 'DELETE' },
+    { value: 'GET', label: 'GET' },
+    { value: 'POST', label: 'POST' },
+    { value: 'PUT', label: 'PUT' },
+    { value: 'DELETE', label: 'DELETE' },
   ];
 
   const handleSelectMethod = (value: string) => {
@@ -83,6 +106,8 @@ export default function AddEndpointForm() {
               type="text"
               placeholder="Enter endpoint name"
               id="endpointName"
+              onChange={(e) => setEndpointName(e.target.value)}
+              value={endpointName}
             />
           </div>
           <div className="col-span-2">
@@ -102,8 +127,12 @@ export default function AddEndpointForm() {
               placeholder="Enter endpoint URL"
               id="url"
               error={errorUrl}
-              onChange={(e) => handleUrlValidation(e.target.value)}
+              onChange={(e) => {
+                setEndpointUrl(e.target.value);
+                handleUrlValidation(e.target.value);
+              }}
               hint={errorUrl ? 'Invalid URL format' : ''}
+              value={endpointUrl}
             />
           </div>
 

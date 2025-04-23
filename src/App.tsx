@@ -11,12 +11,12 @@ function App() {
   return (
     <Routes>
       {/*decomment this when you want to add security to your routes */}
-      {/* <Route element={<PrivateRoutes />}> */}
+      <Route element={<PrivateRoutes />}>
         <Route element={<AppLayout />}>
           <Route path="/endpoints" element={<Endpoints />} />
           <Route path="/add-endpoint-form" element={<AddEndpoint />} />
         </Route>
-      {/* </Route> */}
+      </Route>
       <Route path="/" element={<SignUp />} />
       <Route path="/signin" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />

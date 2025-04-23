@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -10,10 +10,11 @@ import {
 } from '../ui/table';
 
 import PaginationWithIcon from '../tables/PaginationWithIcon';
-import Badge from '../ui/badge/Badge';
 import { Edit, Play, Trash2 } from 'lucide-react';
 import Button from '../ui/button/Button';
 import { useNavigate } from 'react-router-dom';
+import { EndpointModel, getEndpoints } from '../../services/endpointService';
+import JsonPreviewCell from './JsonPreviewCell';
 
 const tableRowData = [
   {
@@ -32,7 +33,7 @@ const tableRowData = [
   },
 ];
 
-type SortKey = 'name' | 'method' | 'url';
+type SortKey = 'name' | 'httpMethod' | 'url';
 type SortOrder = 'asc' | 'desc';
 
 export default function EndpointsTable() {
@@ -42,8 +43,18 @@ export default function EndpointsTable() {
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const [searchTerm, setSearchTerm] = useState('');
 
+  const [endpoints, setEndpoints] = useState<EndpointModel[]>([]);
+
+  useEffect(() => {
+    getEndpoints().then((data) => {
+      console.log('Fetched endpoints:', data);
+      setEndpoints(data);
+    });
+  }, []);
+
   const filteredAndSortedData = useMemo(() => {
-    return tableRowData
+    if (endpoints) {
+    return endpoints
       .filter((item) =>
         Object.values(item).some(
           (value) =>
@@ -61,7 +72,9 @@ export default function EndpointsTable() {
           ? String(a[sortKey]).localeCompare(String(b[sortKey]))
           : String(b[sortKey]).localeCompare(String(a[sortKey]));
       });
-  }, [sortKey, sortOrder, searchTerm]);
+    }
+    return [];
+  }, [endpoints, sortKey, sortOrder, searchTerm]);
 
   const totalItems = filteredAndSortedData.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -90,7 +103,6 @@ export default function EndpointsTable() {
   const handleAddEndpoint = () => {
     navigate('/add-endpoint-form');
   };
-
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -212,7 +224,9 @@ export default function EndpointsTable() {
                   { key: 'name', label: 'Endpoint Name' },
                   { key: 'method', label: 'Method' },
                   { key: 'endpoint', label: 'Endpoint' },
-                  { key: 'hasTests', label: 'Has Tests' },
+                  { key: 'requestBody', label: 'Request Body' },
+                  { key: 'responseBody', label: 'Response Body' },
+                  // { key: 'hasTests', label: 'Has Tests' },
                   { key: 'actions', label: 'Actions' },
                 ].map(({ key, label }) => (
                   <TableCell
@@ -287,14 +301,26 @@ export default function EndpointsTable() {
                     </div>
                   </TableCell>
                   <TableCell
-                    className={`px-4 py-3 font-normal dark:text-gray-400/90 text-gray-800 border border-gray-100 dark:border-white/[0.05] text-theme-sm whitespace-nowrap ${methodBadgeColor(item.method)}`}
+                    className={`px-4 py-3 font-normal dark:text-gray-400/90 text-gray-800 border border-gray-100 dark:border-white/[0.05] text-theme-sm whitespace-nowrap ${methodBadgeColor(item.httpMethod)}`}
                   >
-                    {item.method}
+                    {item.httpMethod}
                   </TableCell>
                   <TableCell className="px-4 py-3 font-normal dark:text-gray-400/90 text-gray-800 border border-gray-100 dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
                     {item.url}
                   </TableCell>
-                  <TableCell className="px-4 py-3 font-normal dark:text-gray-400/90 text-gray-800 border border-gray-100 dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
+                  <TableCell className="px-4 py-3 font-normal dark:text-gray-400/90 text-gray-800 border border-gray-100 dark:border-white/[0.05] text-theme-sm whitespace-wrap">
+                    <JsonPreviewCell
+                      value={item.requestBodyModel}
+                      lineShown={3}
+                    />
+                  </TableCell>
+                  <TableCell className="text-wrap px-4 py-3 font-normal dark:text-gray-400/90 text-gray-800 border border-gray-100 dark:border-white/[0.05] text-theme-sm whitespace-wrap ">
+                    <JsonPreviewCell
+                      value={item.responseBodyModel}
+                      lineShown={3}
+                    />
+                  </TableCell>
+                  {/* <TableCell className="px-4 py-3 font-normal dark:text-gray-400/90 text-gray-800 border border-gray-100 dark:border-white/[0.05] text-theme-sm whitespace-nowrap">
                     {item.hasTests ? (
                       <Badge variant="solid" color="success" size="sm">
                         Yes
@@ -304,8 +330,8 @@ export default function EndpointsTable() {
                         No
                       </Badge>
                     )}
-                  </TableCell>
-                  {/*TODO: add this buttons where you want to start the tests, edit and delete*/}
+                  </TableCell> */}
+                  {/* add this buttons where you want to start the tests, edit and delete*/}
                   <TableCell className="px-4 py-3 font-normal dark:text-gray-400/90 text-gray-800 border border-gray-100 dark:border-white/[0.05] text-theme-sm whitespace-nowrap text-center">
                     <button className="btn-icon btn-outline px-1">
                       <Play className="w-4 h-4" />
