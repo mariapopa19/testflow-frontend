@@ -21,7 +21,8 @@ import {
 import JsonPreviewCell from './JsonPreviewCell';
 import { useModal } from '../../hooks/useModal';
 import DefaultModal from '../modal/DefaultModal';
-import { toast } from 'sonner';
+import { showToast } from '../../utils/toastHelper';
+import toastMessages from '../../constants/toastMessages';
 
 type SortKey = 'name' | 'httpMethod' | 'url';
 type SortOrder = 'asc' | 'desc';
@@ -114,10 +115,10 @@ export default function EndpointsTable() {
       closeModal();
       await deleteEndpoint(id);
       setEndpoints((prev) => prev.filter((item) => item.id !== id));
-      toast.success('Endpoint deleted successfully!');
+      showToast(toastMessages.endpoint.deleteSuccess);
     } catch (error) {
       console.error('Error deleting endpoint:', error);
-      toast.error('Failed to delete endpoint. Please try again.');
+      showToast(toastMessages.endpoint.deleteError);
     }
   };
 

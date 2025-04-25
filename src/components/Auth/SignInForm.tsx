@@ -7,6 +7,8 @@ import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
 import { useGoogleLogin } from "@react-oauth/google";
 import { loginWithGoogle } from "../../services/authService";
+import { showToast } from "../../utils/toastHelper";
+import toastMessages from "../../constants/toastMessages";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -18,8 +20,10 @@ export default function SignInForm() {
       const response = await loginWithGoogle(token);
       sessionStorage.setItem("access_token", response.token);
       navigate("/endpoints");
+      showToast(toastMessages.auth.loginSuccess);
     } catch (err) {
       console.error("Login failed", err);
+      showToast(toastMessages.auth.loginError);
     }
   };
 

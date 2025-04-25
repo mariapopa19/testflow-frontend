@@ -9,6 +9,8 @@ import TextArea from '../form/input/TextArea';
 import { useNavigate } from 'react-router-dom';
 import { addEndpoint, EndpointModel } from '../../services/endpointService';
 import { toast } from 'sonner';
+import { showToast } from '../../utils/toastHelper';
+import toastMessages from '../../constants/toastMessages';
 
 interface AddEndpointFormProps {
   mode?: 'create' | 'edit';
@@ -66,9 +68,9 @@ const AddEndpointForm: React.FC<AddEndpointFormProps> = ({
         responseBodyModel: responseJson,
       });
       navigate('/endpoints');
-      toast.success('Endpoint added successfully!');
+      showToast(toastMessages.endpoint.createSuccess);
     } catch (error) {
-      toast.error('Failed to add endpoint. Please try again.');
+      showToast(toastMessages.endpoint.createError);
       console.error('Error adding endpoint:', error);
     }
   };

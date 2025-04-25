@@ -6,6 +6,8 @@ import Input from '../form/input/InputField';
 import Checkbox from '../form/input/Checkbox';
 import { registerWithGoogle } from '../../services/authService';
 import { useGoogleLogin } from '@react-oauth/google';
+import { showToast } from '../../utils/toastHelper';
+import toastMessages from '../../constants/toastMessages';
 
 export default function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -17,8 +19,10 @@ export default function SignUpForm() {
       const response = await registerWithGoogle(token);
       sessionStorage.setItem('access_token', response.token);
       navigate("/endpoints");
+      showToast(toastMessages.auth.registerSuccess);
     } catch (err) {
       console.error('Register failed', err);
+      showToast(toastMessages.auth.loginError);
     }
   };
 
@@ -26,13 +30,17 @@ export default function SignUpForm() {
     onSuccess: (tokenResponse) => {
       if (tokenResponse.access_token) {
         console.log(tokenResponse);
-        handleRegister(tokenResponse.access_token).catch((err) =>
-          console.error('Error during Google login:', err),
-        );
+        handleRegister(tokenResponse.access_token).catch((err) => {
+          console.error('Error during Google login:', err);
+          showToast(toastMessages.auth.loginError);
+        });
       }
     },
     flow: 'implicit',
-    onError: () => console.error('Google login failed'),
+    onError: () => {
+      console.error('Google login failed');
+      showToast(toastMessages.auth.loginError);
+    }
   });
 
   return (
