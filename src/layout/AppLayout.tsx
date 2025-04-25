@@ -12,7 +12,7 @@ const LayoutContent: React.FC = () => {
       <div>
         <Backdrop />
       </div>
-      <div className={`flex-1 transition-all duration-300 ease-in-out `}>
+      <div className={`flex-1 transition-all duration-300 ease-in-out dark:bg-gray-900 dark:border-gray-800`}>
         <AppHeader />
         <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
           <Outlet />

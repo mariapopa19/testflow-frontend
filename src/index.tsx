@@ -7,6 +7,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { AppWrapper } from './components/common/PageMeta';
+import { Toaster } from 'sonner';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,
@@ -20,6 +21,7 @@ root.render(
             clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID ?? ''} // Ensure this is set in your .env file
           >
             <App />
+            <Toaster richColors position="top-right" />
           </GoogleOAuthProvider>
         </AppWrapper>
       </ThemeProvider>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ComponentCard from '../common/ComponentCard';
 import Label from '../form/Label';
 import Input from '../form/input/InputField';
@@ -7,23 +7,42 @@ import Form from '../form/Form';
 import Button from '../ui/button/Button';
 import TextArea from '../form/input/TextArea';
 import { useNavigate } from 'react-router-dom';
-import { addEndpoint } from '../../services/endpointService';
+import { addEndpoint, EndpointModel } from '../../services/endpointService';
+import { toast } from 'sonner';
 
-export default function AddEndpointForm() {
+interface AddEndpointFormProps {
+  mode?: 'create' | 'edit';
+  initialData?: EndpointModel;
+  onSubmit?: (data: EndpointModel) => void;
+}
+
+const AddEndpointForm: React.FC<AddEndpointFormProps> = ({
+  mode,
+  initialData,
+  onSubmit,
+}) => {
   const [selectedOption, setSelectedOption] = useState<string>('GET');
-  const [endpointName, setEndpointName] = useState<string>('');
-  const [endpointUrl, setEndpointUrl] = useState<string>('');
-  const [requestBody, setRequestBody] = useState<string>('');
-  const [responseBody, setResponseBody] = useState<string>('');
+  const [endpointName, setEndpointName] = useState<string>(
+    initialData?.name ?? '',
+  );
+  const [endpointUrl, setEndpointUrl] = useState<string>(
+    initialData?.url ?? '',
+  );
+  const [requestBody, setRequestBody] = useState<string>(
+    initialData?.requestBodyModel ?? '',
+  );
+  const [responseBody, setResponseBody] = useState<string>(
+    initialData?.responseBodyModel ?? '',
+  );
 
-  const [errorRequest, setErrorRequest] = useState<boolean>(false); // State to track error
-  const [errorResponse, setErrorResponse] = useState<boolean>(false); // State to track error
-  const [errorUrl, setErrorUrl] = useState<boolean>(false); // State to track error
+  const [errorRequest, setErrorRequest] = useState<boolean>(false);
+  const [errorResponse, setErrorResponse] = useState<boolean>(false);
+  const [errorUrl, setErrorUrl] = useState<boolean>(false);
 
-  const navigate = useNavigate(); // Hook to navigate programmatically
+  const navigate = useNavigate();
 
   const handleCancel = () => {
-    navigate('/endpoints'); // Navigate to the desired route
+    navigate('/endpoints');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -47,13 +66,17 @@ export default function AddEndpointForm() {
         responseBodyModel: responseJson,
       });
       navigate('/endpoints');
+      toast.success('Endpoint added successfully!');
     } catch (error) {
+      toast.error('Failed to add endpoint. Please try again.');
       console.error('Error adding endpoint:', error);
     }
   };
 
   const handleUrlValidation = (url: string) => {
-    const regex = new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/);
+    const regex = new RegExp(
+      /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/,
+    );
     if (regex.test(url)) {
       setErrorUrl(false); // valid URL
     } else {
@@ -95,6 +118,16 @@ export default function AddEndpointForm() {
       console.error('Invalid JSON'); // show error or warning
     }
   };
+
+  useEffect(() => {
+    if (initialData) {
+      setEndpointName(initialData.name);
+      setEndpointUrl(initialData.url);
+      setRequestBody(initialData.requestBodyModel ?? '');
+      setResponseBody(initialData.responseBodyModel ?? '');
+      setSelectedOption(initialData.httpMethod);
+    }
+  }, [initialData]);
 
   return (
     <ComponentCard title="Add endpoint">
@@ -146,7 +179,6 @@ export default function AddEndpointForm() {
               error={errorRequest}
               onChange={handleRequestBodyChange}
               hint={errorRequest ? 'Invalid JSON format' : ''}
-              // className=" bg-gray-50 dark:bg-gray-800"
             />
           </div>
 
@@ -160,12 +192,13 @@ export default function AddEndpointForm() {
               error={errorResponse}
               onChange={handleResponseBodyChange}
               hint={errorResponse ? 'Invalid JSON format' : ''}
-              // className=" bg-gray-50 dark:bg-gray-800"
             />
           </div>
 
           <div className="flex gap-3">
-            <Button size="sm">Add endpoint</Button>
+            <Button size="sm">
+              {mode === 'create' ? 'Add endpoint' : 'Update endpoint'}
+            </Button>
             <Button size="sm" variant="outline" onClick={handleCancel}>
               Cancel
             </Button>
@@ -174,4 +207,6 @@ export default function AddEndpointForm() {
       </Form>
     </ComponentCard>
   );
-}
+};
+
+export default AddEndpointForm;

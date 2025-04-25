@@ -6,6 +6,7 @@ import Endpoints from './pages/Endpoints/Endpoints';
 import AppLayout from './layout/AppLayout';
 import PrivateRoutes from './components/routes/PrivateRoute';
 import AddEndpoint from './pages/Endpoints/AddEndpoint';
+import EditEndpointForm from './components/Endpoints/EditEndpointForm';
 
 function App() {
   return (
@@ -15,9 +16,10 @@ function App() {
         <Route element={<AppLayout />}>
           <Route path="/endpoints" element={<Endpoints />} />
           <Route path="/add-endpoint-form" element={<AddEndpoint />} />
+          <Route path="/endpoints/edit/:id" element={<EditEndpointForm  />} />
         </Route>
       </Route>
-      <Route path="/" element={<SignUp />} />
+      <Route path="/" element={<SignIn />} />
       <Route path="/signin" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
     </Routes>

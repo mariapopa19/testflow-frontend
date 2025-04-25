@@ -14,6 +14,11 @@ export const getEndpoints = async (): Promise<EndpointModel[]> => {
   return res.data;
 };
 
+export const getEndpointById = async (id: string): Promise<EndpointModel> => {
+  const res = await api.get<EndpointModel>(`api/Endpoint/${id}`);
+  return res.data;
+};
+
 export const addEndpoint = async (
   data: EndpointModel,
 ): Promise<EndpointModel> => {
@@ -22,5 +27,5 @@ export const addEndpoint = async (
 };
 
 export const deleteEndpoint = async (id: string): Promise<void> => {
-  await api.delete(`api/Endpoints/${id}`);
+  await api.delete(`api/Endpoint/${id}`);
 };

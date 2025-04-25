@@ -13,25 +13,15 @@ import PaginationWithIcon from '../tables/PaginationWithIcon';
 import { Edit, Play, Trash2 } from 'lucide-react';
 import Button from '../ui/button/Button';
 import { useNavigate } from 'react-router-dom';
-import { EndpointModel, getEndpoints } from '../../services/endpointService';
+import {
+  deleteEndpoint,
+  EndpointModel,
+  getEndpoints,
+} from '../../services/endpointService';
 import JsonPreviewCell from './JsonPreviewCell';
-
-const tableRowData = [
-  {
-    id: '1',
-    name: 'Get Users',
-    method: 'GET',
-    url: 'https://api.testflow.com/users',
-    hasTests: true,
-  },
-  {
-    id: '2',
-    name: 'Create User',
-    method: 'POST',
-    url: 'https://api.testflow.com/users/create',
-    hasTests: false,
-  },
-];
+import { useModal } from '../../hooks/useModal';
+import DefaultModal from '../modal/DefaultModal';
+import { toast } from 'sonner';
 
 type SortKey = 'name' | 'httpMethod' | 'url';
 type SortOrder = 'asc' | 'desc';
@@ -54,24 +44,24 @@ export default function EndpointsTable() {
 
   const filteredAndSortedData = useMemo(() => {
     if (endpoints) {
-    return endpoints
-      .filter((item) =>
-        Object.values(item).some(
-          (value) =>
-            typeof value === 'string' &&
-            value.toLowerCase().includes(searchTerm.toLowerCase()),
-        ),
-      )
-      .sort((a, b) => {
-        if (sortKey === 'name') {
+      return endpoints
+        .filter((item) =>
+          Object.values(item).some(
+            (value) =>
+              typeof value === 'string' &&
+              value.toLowerCase().includes(searchTerm.toLowerCase()),
+          ),
+        )
+        .sort((a, b) => {
+          if (sortKey === 'name') {
+            return sortOrder === 'asc'
+              ? a.name.localeCompare(b.name)
+              : b.name.localeCompare(a.name);
+          }
           return sortOrder === 'asc'
-            ? a.name.localeCompare(b.name)
-            : b.name.localeCompare(a.name);
-        }
-        return sortOrder === 'asc'
-          ? String(a[sortKey]).localeCompare(String(b[sortKey]))
-          : String(b[sortKey]).localeCompare(String(a[sortKey]));
-      });
+            ? String(a[sortKey]).localeCompare(String(b[sortKey]))
+            : String(b[sortKey]).localeCompare(String(a[sortKey]));
+        });
     }
     return [];
   }, [endpoints, sortKey, sortOrder, searchTerm]);
@@ -86,15 +76,15 @@ export default function EndpointsTable() {
   const methodBadgeColor = (method: string) => {
     switch (method) {
       case 'GET':
-        return 'bg-green-100 text-green-600';
+        return 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-white/90';
       case 'POST':
-        return 'bg-yellow-100 text-yellow-700';
+        return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-white/90';
       case 'PUT':
-        return 'bg-blue-100 text-blue-600';
+        return 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-white/90';
       case 'DELETE':
-        return 'bg-red-100 text-red-600';
+        return 'bg-red-100 text-red-600 dark:bg-red-900 dark:text-white/90';
       default:
-        return 'bg-gray-100 text-gray-600';
+        return 'bg-gray-100 text-gray-600 dark:bg-gray-900 dark:text-white/90';
     }
   };
 
@@ -116,6 +106,20 @@ export default function EndpointsTable() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
   const currentData = filteredAndSortedData.slice(startIndex, endIndex);
+
+  const { isOpen, openModal, closeModal } = useModal();
+  const confirmDelete = async (id: string) => {
+    // Handle the confirmation action here
+    try {
+      closeModal();
+      await deleteEndpoint(id);
+      setEndpoints((prev) => prev.filter((item) => item.id !== id));
+      toast.success('Endpoint deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting endpoint:', error);
+      toast.error('Failed to delete endpoint. Please try again.');
+    }
+  };
 
   return (
     <div className="overflow-hidden bg-white dark:bg-white/[0.03] rounded-xl">
@@ -333,15 +337,50 @@ export default function EndpointsTable() {
                   </TableCell> */}
                   {/* add this buttons where you want to start the tests, edit and delete*/}
                   <TableCell className="px-4 py-3 font-normal dark:text-gray-400/90 text-gray-800 border border-gray-100 dark:border-white/[0.05] text-theme-sm whitespace-nowrap text-center">
-                    <button className="btn-icon btn-outline px-1">
+                    <button className="btn-icon btn-outline p-0.5 hover:bg-green-100 dark:hover:bg-green-700">
                       <Play className="w-4 h-4" />
                     </button>
-                    <button className="btn-icon btn-outline px-1">
+                    <button
+                      className="btn-icon btn-outline p-0.5 hover:bg-blue-100 dark:hover:bg-blue-700"
+                      onClick={() => navigate(`/endpoints/edit/${item.id}`)}
+                    >
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button className="btn-icon btn-destructive px-1">
+                    <button
+                      className="btn-icon btn-destructive p-0.5 hover:bg-red-100 dark:hover:bg-red-700"
+                      onClick={openModal}
+                    >
                       <Trash2 className="w-4 h-4" />
                     </button>
+                  </TableCell>
+                  < TableCell>
+                    <DefaultModal
+                      isOpen={isOpen}
+                      onClose={closeModal}
+                      title="Delete Endpoint"
+                      className="max-w-[400px] p-5 lg:p-10"
+                    >s
+                      <p className="text-sm leading-6 text-gray-500 dark:text-gray-400">
+                        Are you sure you want to delete {item.name}?
+                      </p>
+                      <div className="flex items-center justify-end w-full gap-3 mt-8">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={closeModal}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="primary"
+                          className="bg-red-500"
+                          onClick={() => confirmDelete(item.id ?? '')}
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </DefaultModal>
                   </TableCell>
                 </TableRow>
               ))}
