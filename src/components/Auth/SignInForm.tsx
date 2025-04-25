@@ -9,16 +9,23 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { loginWithGoogle } from "../../services/authService";
 import { showToast } from "../../utils/toastHelper";
 import toastMessages from "../../constants/toastMessages";
+import { useUser } from "../../context/UserContex";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const navigate = useNavigate();
+  const { setUser } = useUser();
 
   const handleGoogleLogin = async (token: string) => {
     try {
       const response = await loginWithGoogle(token);
       sessionStorage.setItem("access_token", response.token);
+      setUser({
+        email: response.email,
+        name: response.name,
+        picture: response.picture,
+      });
       navigate("/endpoints");
       showToast(toastMessages.auth.loginSuccess);
     } catch (err) {

@@ -4,6 +4,7 @@ interface AuthResponse {
   token: string;
   email: string;
   name: string;
+  picture: string;
 }
 
 export const loginWithGoogle = async (

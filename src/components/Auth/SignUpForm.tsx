@@ -8,17 +8,24 @@ import { registerWithGoogle } from '../../services/authService';
 import { useGoogleLogin } from '@react-oauth/google';
 import { showToast } from '../../utils/toastHelper';
 import toastMessages from '../../constants/toastMessages';
+import { useUser } from '../../context/UserContex';
 
 export default function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const navigate = useNavigate();
+  const { setUser } = useUser();
 
   const handleRegister = async (token: string) => {
     try {
       const response = await registerWithGoogle(token);
       sessionStorage.setItem('access_token', response.token);
-      navigate("/endpoints");
+      setUser({
+        email: response.email,
+        name: response.name,
+        picture: response.picture,
+      });
+      navigate('/endpoints');
       showToast(toastMessages.auth.registerSuccess);
     } catch (err) {
       console.error('Register failed', err);
@@ -40,7 +47,7 @@ export default function SignUpForm() {
     onError: () => {
       console.error('Google login failed');
       showToast(toastMessages.auth.loginError);
-    }
+    },
   });
 
   return (
@@ -174,7 +181,9 @@ export default function SignUpForm() {
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
-                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      aria-label={
+                        showPassword ? 'Hide password' : 'Show password'
+                      }
                     >
                       {showPassword ? (
                         <EyeIcon className="fill-gray-500 dark:fill-gray-400 size-5" />

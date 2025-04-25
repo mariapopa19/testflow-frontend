@@ -8,6 +8,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { AppWrapper } from './components/common/PageMeta';
 import { Toaster } from 'sonner';
+import { UserProvider } from './context/UserContex';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,
@@ -15,16 +16,18 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Router>
-      <ThemeProvider>
-        <AppWrapper>
-          <GoogleOAuthProvider
-            clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID ?? ''} // Ensure this is set in your .env file
-          >
-            <App />
-            <Toaster richColors position="top-right" />
-          </GoogleOAuthProvider>
-        </AppWrapper>
-      </ThemeProvider>
+      <UserProvider>
+        <ThemeProvider>
+          <AppWrapper>
+            <GoogleOAuthProvider
+              clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID ?? ''} // Ensure this is set in your .env file
+            >
+              <App />
+              <Toaster richColors position="top-right" />
+            </GoogleOAuthProvider>
+          </AppWrapper>
+        </ThemeProvider>
+      </UserProvider>
     </Router>
   </React.StrictMode>,
 );
