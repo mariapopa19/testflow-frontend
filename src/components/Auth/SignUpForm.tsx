@@ -4,7 +4,7 @@ import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from '../../assets/icons';
 import Label from '../form/Label';
 import Input from '../form/input/InputField';
 import Checkbox from '../form/input/Checkbox';
-import { registerWithGoogle } from '../../services/authService';
+import { registerWithEmail, registerWithGoogle } from '../../services/authService';
 import { useGoogleLogin } from '@react-oauth/google';
 import { showToast } from '../../utils/toastHelper';
 import toastMessages from '../../constants/toastMessages';
@@ -16,7 +16,33 @@ export default function SignUpForm() {
   const navigate = useNavigate();
   const { setUser } = useUser();
 
-  const handleRegister = async (token: string) => {
+  const handleRegistration = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try{
+      const formData = new FormData(e.currentTarget);
+      const fname = formData.get('fname') as string;
+      const lname = formData.get('lname') as string;
+      const email = formData.get('email') as string;
+      const password = formData.get('password') as string;
+
+      // Call your registration API here
+      // Example: await registerWithEmail(fname, lname, email, password);
+      const response = await registerWithEmail(`${fname} ${lname}`, email, password);
+      sessionStorage.setItem('access_token', response.token);
+      setUser({
+        email: response.email,
+        name: response.name,
+        picture: response.picture,
+      });
+      navigate('/endpoints');
+      showToast(toastMessages.auth.registerSuccess);
+    } catch (err) {
+      console.error('Registration failed', err);
+      showToast(toastMessages.auth.registerError);
+    }
+  }
+
+  const handleGoogleRegister = async (token: string) => {
     try {
       const response = await registerWithGoogle(token);
       sessionStorage.setItem('access_token', response.token);
@@ -37,8 +63,8 @@ export default function SignUpForm() {
     onSuccess: (tokenResponse) => {
       if (tokenResponse.access_token) {
         console.log(tokenResponse);
-        handleRegister(tokenResponse.access_token).catch((err) => {
-          console.error('Error during Google login:', err);
+        handleGoogleRegister(tokenResponse.access_token).catch((err) => {
+          console.error('Error during Google registration:', err);
           showToast(toastMessages.auth.loginError);
         });
       }
@@ -127,7 +153,7 @@ export default function SignUpForm() {
                 </span>
               </div>
             </div>
-            <form>
+            <form onSubmit={handleRegistration}>
               <div className="space-y-5">
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   {/* <!-- First Name --> */}
@@ -176,6 +202,8 @@ export default function SignUpForm() {
                     <Input
                       placeholder="Enter your password"
                       type={showPassword ? 'text' : 'password'}
+                      id="password"
+                      name="password"
                     />
                     <button
                       type="button"

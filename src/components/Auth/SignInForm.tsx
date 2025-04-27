@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "../../assets/icons";
 import Label from "../form/Label";
@@ -6,7 +6,7 @@ import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
 import { useGoogleLogin } from "@react-oauth/google";
-import { loginWithGoogle } from "../../services/authService";
+import { loginWithEmail, loginWithGoogle } from "../../services/authService";
 import { showToast } from "../../utils/toastHelper";
 import toastMessages from "../../constants/toastMessages";
 import { useUser } from "../../context/UserContex";
@@ -14,8 +14,29 @@ import { useUser } from "../../context/UserContex";
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { setUser } = useUser();
+  
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const response = await loginWithEmail(email, password);
+      sessionStorage.setItem("access_token", response.token);
+      setUser({
+        email: response.email,
+        name: response.name,
+        picture: response.picture,
+      });
+      navigate("/endpoints");
+      showToast(toastMessages.auth.loginSuccess);
+    }
+    catch (err) {
+      console.error("Login failed", err);
+      showToast(toastMessages.auth.loginError);
+    }
+  };
 
   const handleGoogleLogin = async (token: string) => {
     try {
@@ -122,13 +143,13 @@ export default function SignInForm() {
                 </span>
               </div>
             </div>
-            <form>
+            <form onSubmit={(e) => { handleLogin(e) }}>
               <div className="space-y-6">
                 <div>
                   <Label>
                     Email <span className="text-error-500">*</span>{" "}
                   </Label>
-                  <Input placeholder="info@gmail.com" />
+                  <Input placeholder="info@gmail.com" onChange={(e) => setEmail(e.target.value)}/>
                 </div>
                 <div>
                   <Label>
@@ -138,6 +159,7 @@ export default function SignInForm() {
                     <Input
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
+                      onChange={(e) => setPassword(e.target.value)}
                     />
                     <button
                       type="button"

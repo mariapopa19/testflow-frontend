@@ -24,3 +24,28 @@ export const registerWithGoogle = async (
   });
   return response.data;
 };
+
+export const loginWithEmail = async (
+  email: string,
+  password: string,
+): Promise<AuthResponse> => {
+  const response = await api.post<AuthResponse>('/api/auth/login', {
+    email,
+    password,
+  });
+  return response.data;
+}
+
+export const registerWithEmail = async (
+  name: string,
+  email: string,
+  password: string,
+): Promise<AuthResponse> => {
+  const response = await api.post<AuthResponse>('/api/auth/register', {
+    name,
+    email,
+    password,
+  });
+  return response.data;
+};
+
