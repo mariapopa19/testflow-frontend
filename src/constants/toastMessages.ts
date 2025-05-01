@@ -21,6 +21,10 @@ const toastMessages = {
       type: 'error',
       message: 'Failed to delete endpoint. Please try again.',
     } satisfies ToastMessages,
+    updateError: {
+      type: 'error',
+      message: 'Failed to update endpoint. Please try again.',
+    } satisfies ToastMessages,
   },
   auth: {
     loginSuccess: {

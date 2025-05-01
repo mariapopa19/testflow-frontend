@@ -56,8 +56,8 @@ export default function EndpointsTable() {
         .sort((a, b) => {
           if (sortKey === 'name') {
             return sortOrder === 'asc'
-              ? a.name.localeCompare(b.name)
-              : b.name.localeCompare(a.name);
+              ? (a.name ?? '').localeCompare(b.name ?? '')
+              : (b.name ?? '').localeCompare(a.name ?? '');
           }
           return sortOrder === 'asc'
             ? String(a[sortKey]).localeCompare(String(b[sortKey]))
@@ -306,7 +306,7 @@ export default function EndpointsTable() {
                     </div>
                   </TableCell>
                   <TableCell
-                    className={`px-4 py-3 font-normal dark:text-gray-400/90 text-gray-800 border border-gray-100 dark:border-white/[0.05] text-theme-sm whitespace-nowrap ${methodBadgeColor(item.httpMethod)}`}
+                    className={`px-4 py-3 font-normal dark:text-gray-400/90 text-gray-800 border border-gray-100 dark:border-white/[0.05] text-theme-sm whitespace-nowrap ${methodBadgeColor(item.httpMethod ?? '')}`}
                   >
                     {item.httpMethod}
                   </TableCell>

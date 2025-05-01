@@ -8,7 +8,6 @@ import Button from '../ui/button/Button';
 import TextArea from '../form/input/TextArea';
 import { useNavigate } from 'react-router-dom';
 import { addEndpoint, EndpointModel } from '../../services/endpointService';
-import { toast } from 'sonner';
 import { showToast } from '../../utils/toastHelper';
 import toastMessages from '../../constants/toastMessages';
 
@@ -47,7 +46,9 @@ const AddEndpointForm: React.FC<AddEndpointFormProps> = ({
     navigate('/endpoints');
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (mode === 'create'){
     let requestJson: string = '';
     let responseJson: string = '';
     if (requestBody !== '') {
@@ -57,7 +58,6 @@ const AddEndpointForm: React.FC<AddEndpointFormProps> = ({
       responseJson = JSON.stringify(JSON.parse(responseBody));
     }
 
-    e.preventDefault();
 
     try {
       await addEndpoint({
@@ -72,6 +72,23 @@ const AddEndpointForm: React.FC<AddEndpointFormProps> = ({
     } catch (error) {
       showToast(toastMessages.endpoint.createError);
       console.error('Error adding endpoint:', error);
+    }
+  } else {
+    try{
+      if (onSubmit) {
+        onSubmit( {
+          name: endpointName,
+          httpMethod: selectedOption,
+          url: endpointUrl,
+          requestBodyModel: requestBody,
+          responseBodyModel: responseBody,
+        });
+        navigate('/endpoints');
+      }
+    } catch (error) {
+      console.error('Error during form submission:', error);
+      showToast(toastMessages.endpoint.updateError);
+    }
     }
   };
 
@@ -123,11 +140,11 @@ const AddEndpointForm: React.FC<AddEndpointFormProps> = ({
 
   useEffect(() => {
     if (initialData) {
-      setEndpointName(initialData.name);
-      setEndpointUrl(initialData.url);
+      setEndpointName(initialData.name ?? '');
+      setEndpointUrl(initialData.url ?? '');
       setRequestBody(initialData.requestBodyModel ?? '');
       setResponseBody(initialData.responseBodyModel ?? '');
-      setSelectedOption(initialData.httpMethod);
+      setSelectedOption(initialData.httpMethod ?? '');
     }
   }, [initialData]);
 
