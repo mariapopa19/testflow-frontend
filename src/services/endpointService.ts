@@ -10,7 +10,7 @@ export interface EndpointModel {
 }
 
 export const getEndpoints = async (): Promise<EndpointModel[]> => {
-  const res = await api.get<EndpointModel[]>('api/Endpoint');
+  const res = await api.get<EndpointModel[]>('api/Endpoint/all-endpoints');
   return res.data;
 };
 

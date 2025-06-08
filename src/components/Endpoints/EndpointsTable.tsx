@@ -20,9 +20,10 @@ import {
 } from '../../services/endpointService';
 import JsonPreviewCell from './JsonPreviewCell';
 import { useModal } from '../../hooks/useModal';
-import DefaultModal from '../modal/DefaultModal';
 import { showToast } from '../../utils/toastHelper';
 import toastMessages from '../../constants/toastMessages';
+import RunTestModal from '../RunTest/RunTestModal';
+import DeleteEndpointModal from './DeleteEndpointModal';
 
 type SortKey = 'name' | 'httpMethod' | 'url';
 type SortOrder = 'asc' | 'desc';
@@ -108,18 +109,50 @@ export default function EndpointsTable() {
   const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
   const currentData = filteredAndSortedData.slice(startIndex, endIndex);
 
-  const { isOpen, openModal, closeModal } = useModal();
-  const confirmDelete = async (id: string) => {
-    // Handle the confirmation action here
+  const {
+  isOpen: isDeleteOpen,
+  openModal: openDeleteModal,
+  closeModal: closeDeleteModal,
+} = useModal();
+
+const [endpointToDelete, setEndpointToDelete] = useState<EndpointModel | null>(null);
+
+const confirmDelete = async () => {
+  if (endpointToDelete) {
     try {
-      closeModal();
-      await deleteEndpoint(id);
-      setEndpoints((prev) => prev.filter((item) => item.id !== id));
+      await deleteEndpoint(endpointToDelete.id ?? '');
+      setEndpoints((prev) =>
+        prev.filter((item) => item.id !== endpointToDelete?.id),
+      );
       showToast(toastMessages.endpoint.deleteSuccess);
+      const updatedEndpoints = await getEndpoints();
+      setEndpoints(updatedEndpoints);
     } catch (error) {
-      console.error('Error deleting endpoint:', error);
+      console.error('Failed to delete endpoint:', error);
       showToast(toastMessages.endpoint.deleteError);
+    } finally {
+      closeDeleteModal();
+      setEndpointToDelete(null);
     }
+  }
+};
+
+const handleDeleteClick = (endpoint: EndpointModel) => {
+  setEndpointToDelete(endpoint);
+  openDeleteModal();
+};
+
+const {
+  isOpen: isRunOpen,
+  openModal: openRunModal,
+  closeModal: closeRunModal,
+} = useModal();
+const [selectedEndpoint, setSelectedEndpoint] =
+  useState<EndpointModel | null>(null);
+
+  const handleRunClick = (endpoint: EndpointModel) => {
+    setSelectedEndpoint(endpoint);
+    openRunModal();
   };
 
   return (
@@ -338,7 +371,10 @@ export default function EndpointsTable() {
                   </TableCell> */}
                   {/* add this buttons where you want to start the tests, edit and delete*/}
                   <TableCell className="px-4 py-3 font-normal dark:text-gray-400/90 text-gray-800 border border-gray-100 dark:border-white/[0.05] text-theme-sm whitespace-nowrap text-center">
-                    <button className="btn-icon btn-outline p-0.5 hover:bg-green-100 dark:hover:bg-green-700">
+                    <button
+                      className="btn-icon btn-outline p-0.5 hover:bg-green-100 dark:hover:bg-green-700"
+                      onClick={() => handleRunClick(item)}
+                    >
                       <Play className="w-4 h-4" />
                     </button>
                     <button
@@ -349,46 +385,31 @@ export default function EndpointsTable() {
                     </button>
                     <button
                       className="btn-icon btn-destructive p-0.5 hover:bg-red-100 dark:hover:bg-red-700"
-                      onClick={openModal}
+                      onClick={() => handleDeleteClick(item)}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
-                  </TableCell>
-                  < TableCell>
-                    <DefaultModal
-                      isOpen={isOpen}
-                      onClose={closeModal}
-                      title="Delete Endpoint"
-                      className="max-w-[400px] p-5 lg:p-10"
-                    >s
-                      <p className="text-sm leading-6 text-gray-500 dark:text-gray-400">
-                        Are you sure you want to delete {item.name}?
-                      </p>
-                      <div className="flex items-center justify-end w-full gap-3 mt-8">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={closeModal}
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="primary"
-                          className="bg-red-500"
-                          onClick={() => confirmDelete(item.id ?? '')}
-                        >
-                          Delete
-                        </Button>
-                      </div>
-                    </DefaultModal>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+          
         </div>
       </div>
+
+      <DeleteEndpointModal
+  isOpen={isDeleteOpen}
+  onClose={closeDeleteModal}
+  endpoint={endpointToDelete}
+  onConfirm={confirmDelete}
+/>
+
+      <RunTestModal
+        isOpen={isRunOpen}
+        onClose={closeRunModal}
+        endpoint={selectedEndpoint}
+      />
 
       <div className="border border-t-0 rounded-b-xl border-gray-100 py-4 pl-[18px] pr-4 dark:border-white/[0.05]">
         <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between">

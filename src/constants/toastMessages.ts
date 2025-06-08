@@ -48,6 +48,28 @@ const toastMessages = {
       message: 'Registration failed. Please try again.',
     } satisfies ToastMessages,
   },
+  testRun: {
+    runSuccess: {
+      type: 'success',
+      message: 'Test run started successfully!',
+    } satisfies ToastMessages,
+    runError: {
+      type: 'error',
+      message: 'Failed to start test run. Please try again.',
+    } satisfies ToastMessages,
+    generateSuccess: {
+      type: 'success',
+      message: 'Test case generated successfully!',
+    } satisfies ToastMessages,
+    generateError: {
+      type: 'error',
+      message: 'Failed to generate test case. Please try again.',
+    } satisfies ToastMessages,
+    generateAIError: {
+      type: 'error',
+      message: 'Failed to generate test case with AI.',
+    } satisfies ToastMessages,
+  },
 };
 
 export default toastMessages;
