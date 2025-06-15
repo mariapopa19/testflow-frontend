@@ -70,6 +70,20 @@ const toastMessages = {
       message: 'Failed to generate test case with AI.',
     } satisfies ToastMessages,
   },
+  reports: {
+    deleteSuccess: {
+      type: 'success',
+      message: 'Report deleted successfully!',
+    } satisfies ToastMessages,
+    deleteError: {
+      type: 'error',
+      message: 'Failed to delete report. Please try again.',
+    } satisfies ToastMessages,
+    loadError: {
+      type: 'error',
+      message: 'Failed to load reports. Please try again.',
+    } satisfies ToastMessages
+  },
 };
 
 export default toastMessages;

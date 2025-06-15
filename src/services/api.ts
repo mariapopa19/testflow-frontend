@@ -19,8 +19,8 @@ api.interceptors.response.use(
   error => {
     if (error.response?.status === 401) {
       console.log('AXIOS ERROR:', error.response);
-      sessionStorage.removeItem('access_token'); // optional: clear token
-      window.location.href = '/'; // redirect to login page
+      sessionStorage.removeItem('access_token'); 
+      window.location.href = '/';
     }
     return Promise.reject(error instanceof Error ? error : new Error(error.message ?? 'An unknown error occurred'));
   }

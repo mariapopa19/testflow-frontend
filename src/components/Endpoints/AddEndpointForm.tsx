@@ -6,7 +6,7 @@ import Select from '../form/Select';
 import Form from '../form/Form';
 import Button from '../ui/button/Button';
 import TextArea from '../form/input/TextArea';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { addEndpoint, EndpointModel } from '../../services/endpointService';
 import { showToast } from '../../utils/toastHelper';
 import toastMessages from '../../constants/toastMessages';
@@ -57,7 +57,6 @@ const AddEndpointForm: React.FC<AddEndpointFormProps> = ({
     if (responseBody !== '') {
       responseJson = JSON.stringify(JSON.parse(responseBody));
     }
-
 
     try {
       await addEndpoint({

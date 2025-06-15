@@ -1,12 +1,14 @@
 import './assets/styles/App.css';
 import SignIn from './pages/Authentication/SignIn';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router';
 import SignUp from './pages/Authentication/SignUp';
 import Endpoints from './pages/Endpoints/Endpoints';
 import AppLayout from './layout/AppLayout';
 import PrivateRoutes from './components/routes/PrivateRoute';
 import AddEndpoint from './pages/Endpoints/AddEndpoint';
 import EditEndpointForm from './components/Endpoints/EditEndpointForm';
+import Reports from './pages/Reports/Reports';
+import SingleReport from './pages/Reports/SingleReport';
 
 function App() {
   return (
@@ -17,6 +19,9 @@ function App() {
           <Route path="/endpoints" element={<Endpoints />} />
           <Route path="/add-endpoint-form" element={<AddEndpoint />} />
           <Route path="/endpoints/edit/:id" element={<EditEndpointForm  />} />
+           {/* Ambele rute încarcă acum componenta `Reports` */}
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/reports/:id" element={<Reports />} /> 
         </Route>
       </Route>
       <Route path="/" element={<SignIn />} />

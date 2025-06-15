@@ -12,7 +12,7 @@ import {
 import PaginationWithIcon from '../tables/PaginationWithIcon';
 import { Edit, Play, Trash2 } from 'lucide-react';
 import Button from '../ui/button/Button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import {
   deleteEndpoint,
   EndpointModel,

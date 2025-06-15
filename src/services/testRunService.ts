@@ -10,6 +10,7 @@ export interface TestCaseGenerationItem {
 export type TestCaseGenerationResponse = TestCaseGenerationItem[];
 
 export interface TestRunResponseItem {
+  id: string;
   testCaseType: string;
   input: string;
   expectedStatusCode: number[];

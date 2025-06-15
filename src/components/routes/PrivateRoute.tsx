@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router';
 const PrivateRoutes: React.FC = () => {
   const isAuthenticated: boolean = !!sessionStorage.getItem('access_token');
   return (

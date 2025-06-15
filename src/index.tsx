@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router';
 import { ThemeProvider } from './context/ThemeContext';
 import { AppWrapper } from './components/common/PageMeta';
 import { Toaster } from 'sonner';

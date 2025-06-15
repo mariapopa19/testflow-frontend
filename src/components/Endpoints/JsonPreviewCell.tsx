@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 
 interface JsonPreviewCellProps {
   value?: string | null;
@@ -13,14 +13,22 @@ const JsonPreviewCell: React.FC<JsonPreviewCellProps> = ({
 
   const parsedJson = useMemo(() => {
     try {
-      return JSON.stringify(JSON.parse(value ?? '{}'), null, 2);
+      // Încercăm să parsăm JSON-ul, altfel returnăm string-ul original sau 'N/A'
+      const parsed = JSON.parse(value ?? '{}');
+      return JSON.stringify(parsed, null, 2);
     } catch {
-      return 'N/A';
+      // Dacă parsing-ul eșuează, verificăm dacă valoarea nu este vidă
+      return value && value.trim() !== '' ? value : 'N/A';
     }
   }, [value]);
 
   const lineCount = parsedJson.split('\n').length;
   const showExpand = lineCount > lineShown;
+
+  useEffect(() => {
+    setExpanded(false);
+  }, [value]);
+
 
   return (
     <div className="relative">
