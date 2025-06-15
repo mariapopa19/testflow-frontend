@@ -13,12 +13,14 @@ import {
   generateTestCaseFunctional,
   generateTestCaseValidation,
   generateTestCaseFuzzy,
+  TestRunResponseItem,
 } from '../../services/testRunService';
 import { EndpointModel } from '../../services/endpointService';
 import { showToast } from '../../utils/toastHelper';
 import toastMessages from '../../constants/toastMessages';
 import { JSX } from 'react/jsx-runtime';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
+import { createTestReport } from '../../services/reportService'; // Import new service
 
 type Props = {
   isOpen: boolean;
@@ -33,7 +35,7 @@ const RunTestModal = ({ isOpen, onClose, endpoint }: Props) => {
   const [genMode, setGenMode] = useState<'normal' | 'ai' | 'run' | null>(null)
 
   const handleGenerate = async (type: string, ai: boolean) => {
-    if (!endpoint?.id) return; // <-- Ensure endpoint.id is defined
+    if (!endpoint?.id) return;
     try {
       setGenMode(ai ? 'ai' : 'normal')
       setLoadingType(type)
@@ -63,40 +65,45 @@ const RunTestModal = ({ isOpen, onClose, endpoint }: Props) => {
 
   const handleRun = async (type: string) => {
     if (!endpoint?.id) return;
+
+    setGenMode('run');
+    setLoadingType(type);
+
+    // Declare testResults here to ensure it's in scope for the whole function
+    let testResults: TestRunResponseItem[] = [];
+
+
     try {
-      setGenMode('run');
-      setLoadingType(type);
-      let result;
-      
+      // Step 1: Run the test. The result is not directly used for navigation.
       if (type === 'functional') {
-        result = await runTestCasesFunctional(endpoint.id, true);
+        testResults = await runTestCasesFunctional(endpoint.id, true);
       } else if (type === 'validation') {
-        result = await runTestCasesValidation(endpoint.id, true);
+        testResults = await runTestCasesValidation(endpoint.id, true);
       } else if (type === 'fuzzy') {
-        result = await runTestCasesFuzzy(endpoint.id, true);
+        testResults = await runTestCasesFuzzy(endpoint.id, true);
+      }
+      // Assuming the testRunId is available in the test results
+      // This part might need adjustment based on the actual API response structure
+      // @ts-ignore - Assuming testRunId exists on the response items
+      const testRunId = testResults.length > 0 ? testResults[0].testRunId : null;
+
+      if (!testRunId) {
+        throw new Error("testRunId not found in the test run response.");
       }
 
+      // Step 2: Create the report using the new service
+      const newReport = await createTestReport(testRunId, type);
+
       showToast(toastMessages.testRun.runSuccess);
-      onClose();
-      console.log('Test run result:', result);
-      // if (!result || !result.id) {
-      //   // Handle case where result is not valid
-      //   showToast(toastMessages.testRun.runError);
-      //   return;
-      // }
-      // Navigate to the report page with the test results
-      // navigate(`/reports/${result.map(r => r.id).join(',')}`, {
-      //   state: {
-      //     reportData: result,
-      //     fromTest: true,
-      //     testType: type,
-      //     endpointName: endpoint.name 
-      //   } 
-      // });
+      onClose(); // Close the modal immediately
+      
+      // Step 3: Navigate to the newly created report page
+      navigate(`/reports/${newReport.id}`); 
+      
     } catch (error) {
+      console.error("Failed to run test or find report:", error);
       showToast(toastMessages.testRun.runError);
-    } finally {
-      setLoadingType(null);
+      setLoadingType(null); // Reset loading state on error
       setGenMode(null);
     }
   };

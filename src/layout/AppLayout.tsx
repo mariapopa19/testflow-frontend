@@ -1,11 +1,8 @@
-// import { SidebarProvider, useSidebar } from "../context/SidebarContext";
 import { Outlet, Link, useLocation } from 'react-router';
 import AppHeader from './AppHeader';
 import Backdrop from './Backdrop';
-// import AppSidebar from "./AppSidebar";
 
 const LayoutContent: React.FC = () => {
-  // const { isExpanded, isHovered, isMobileOpen } = useSidebar();
   const location = useLocation();
 
   return (
@@ -42,6 +39,19 @@ const LayoutContent: React.FC = () => {
                 Reports
               </Link>
             </li>
+            {/* New Link for Test History */}
+            <li>
+              <Link
+                to="/test-runs"
+                className={`text-sm font-medium py-2 px-3 rounded-lg transition-colors ${
+                  location.pathname.startsWith('/test-runs')
+                    ? 'bg-brand-500 text-white'
+                    : 'text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'
+                }`}
+              >
+                Test History
+              </Link>
+            </li>
           </ul>
         </nav>
         <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
@@ -54,9 +64,7 @@ const LayoutContent: React.FC = () => {
 
 const AppLayout: React.FC = () => {
   return (
-    // <SidebarProvider>
-      <LayoutContent />
-    // </SidebarProvider>
+    <LayoutContent />
   );
 };
 

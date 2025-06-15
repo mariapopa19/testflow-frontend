@@ -12,6 +12,15 @@ export interface TestReport {
   results: TestRunResponseItem[];
 }
 
+export const createTestReport = async (
+  testRunId: string,
+  testType: string): Promise<TestReport> => {
+  const response = await api.post<TestReport>('/api/test-reports', { 
+    testRunId,
+    testType
+  });
+  return response.data;
+};
 
 export const getTestReports = async (): Promise<TestReport[]> => {
   const response = await api.get<TestReport[]>('/api/test-reports');

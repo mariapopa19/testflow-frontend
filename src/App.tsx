@@ -8,7 +8,7 @@ import PrivateRoutes from './components/routes/PrivateRoute';
 import AddEndpoint from './pages/Endpoints/AddEndpoint';
 import EditEndpointForm from './components/Endpoints/EditEndpointForm';
 import Reports from './pages/Reports/Reports';
-import SingleReport from './pages/Reports/SingleReport';
+import TestRuns from './pages/TestRuns/TestRuns';
 
 function App() {
   return (
@@ -22,6 +22,7 @@ function App() {
            {/* Ambele rute încarcă acum componenta `Reports` */}
           <Route path="/reports" element={<Reports />} />
           <Route path="/reports/:id" element={<Reports />} /> 
+          <Route path="/test-runs" element={<TestRuns />} /> 
         </Route>
       </Route>
       <Route path="/" element={<SignIn />} />
