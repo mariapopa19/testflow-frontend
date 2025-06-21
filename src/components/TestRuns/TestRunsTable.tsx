@@ -41,6 +41,50 @@ export default function TestRunsTable() {
 
   const navigate = useNavigate();
 
+  // Helper function to parse .NET TimeSpan format to milliseconds
+  const parseTimeSpanToMs = (timeSpan: string): number => {
+    // TimeSpan format: "HH:MM:SS.fffffff" or "DD.HH:MM:SS.fffffff"
+    const parts = timeSpan.split(':');
+    if (parts.length !== 3) return 0;
+
+    let hours = 0;
+    let minutes = 0;
+    let seconds = 0;
+
+    // Handle days if present (format: "DD.HH:MM:SS.fffffff")
+    const firstPart = parts[0];
+    if (firstPart.includes('.')) {
+      const daysParts = firstPart.split('.');
+      const days = parseInt(daysParts[0], 10) || 0;
+      hours = parseInt(daysParts[1], 10) || 0;
+      hours += days * 24;
+    } else {
+      hours = parseInt(firstPart, 10) || 0;
+    }
+
+    minutes = parseInt(parts[1], 10) || 0;
+    seconds = parseFloat(parts[2]) || 0;
+
+    return (hours * 3600 + minutes * 60 + seconds) * 1000;
+  };
+
+  // Helper function to format duration. Handles both string (TimeSpan) and number (milliseconds) inputs.
+  const formatDuration = (duration: string | number): string => {
+    let ms: number;
+
+    if (typeof duration === 'string') {
+      ms = parseTimeSpanToMs(duration);
+    } else {
+      ms = duration;
+    }
+
+    if (ms === 0) return '0 ms';
+    if (ms < 1000) {
+      return `${Math.round(ms)} ms`;
+    }
+    return `${(ms / 1000).toFixed(2)} s`;
+  };
+
   useEffect(() => {
     const fetchTestRuns = async () => {
       setLoading(true);
@@ -187,7 +231,7 @@ export default function TestRunsTable() {
                                     <Badge variant="solid" color="success" size="sm">Passed</Badge>
                                 )}
                             </TableCell>
-                            <TableCell className="px-4 py-3 italic border border-gray-100 dark:border-white/[0.05] whitespace-nowrap text-gray-400">{run.duration}</TableCell>
+                            <TableCell className="px-4 py-3 italic border border-gray-100 dark:border-white/[0.05] whitespace-nowrap text-gray-400">{run.duration ? formatDuration(run.duration) : 'N/A'}</TableCell>
                             <TableCell className="px-4 py-3 border border-gray-100 dark:border-white/[0.05] whitespace-nowrap">
                                 <Button size="sm" variant="outline" onClick={() => navigate(`/reports/${run.id}`)}>
                                     <Eye className="w-4 h-4 mr-2" />

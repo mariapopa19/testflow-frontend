@@ -14,10 +14,43 @@ interface Props {
 const RecentTestRunsTable: React.FC<Props> = ({ data }) => {
   const navigate = useNavigate();
 
-  // Helper function to format duration. Assuming duration is in milliseconds.
-  const formatDuration = (ms: number) => {
+  const parseTimeSpanToMs = (timeSpan: string): number => {
+    const parts = timeSpan.split(':');
+    if (parts.length !== 3) return 0;
+
+    let hours = 0;
+    let minutes = 0;
+    let seconds = 0;
+
+    const firstPart = parts[0];
+    if (firstPart.includes('.')) {
+      const daysParts = firstPart.split('.');
+      const days = parseInt(daysParts[0], 10) || 0;
+      hours = parseInt(daysParts[1], 10) || 0;
+      hours += days * 24;
+    } else {
+      hours = parseInt(firstPart, 10) || 0;
+    }
+
+    minutes = parseInt(parts[1], 10) || 0;
+    seconds = parseFloat(parts[2]) || 0;
+
+    return (hours * 3600 + minutes * 60 + seconds) * 1000;
+  };
+
+
+  const formatDuration = (duration: string | number): string => {
+    let ms: number;
+
+    if (typeof duration === 'string') {
+      ms = parseTimeSpanToMs(duration);
+    } else {
+      ms = duration;
+    }
+
+    if (ms === 0) return '0 ms';
     if (ms < 1000) {
-      return `${ms} ms`;
+      return `${Math.round(ms)} ms`;
     }
     return `${(ms / 1000).toFixed(2)} s`;
   };
