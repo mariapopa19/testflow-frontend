@@ -29,7 +29,7 @@ export default function SignInForm() {
         name: response.name,
         picture: response.picture,
       });
-      navigate("/endpoints");
+      navigate("/dashboard");
       showToast(toastMessages.auth.loginSuccess);
     }
     catch (err) {
@@ -47,7 +47,7 @@ export default function SignInForm() {
         name: response.name,
         picture: response.picture,
       });
-      navigate("/endpoints");
+      navigate("/dashboard");
       showToast(toastMessages.auth.loginSuccess);
     } catch (err) {
       console.error("Login failed", err);

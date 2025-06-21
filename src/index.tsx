@@ -6,7 +6,6 @@ import reportWebVitals from './reportWebVitals';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { BrowserRouter as Router } from 'react-router';
 import { ThemeProvider } from './context/ThemeContext';
-import { AppWrapper } from './components/common/PageMeta';
 import { Toaster } from 'sonner';
 import { UserProvider } from './context/UserContex';
 
@@ -18,14 +17,12 @@ root.render(
     <Router>
       <UserProvider>
         <ThemeProvider>
-          <AppWrapper>
             <GoogleOAuthProvider
               clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID ?? ''} // Ensure this is set in your .env file
             >
               <App />
               <Toaster richColors position="top-right" />
             </GoogleOAuthProvider>
-          </AppWrapper>
         </ThemeProvider>
       </UserProvider>
     </Router>

@@ -17,8 +17,6 @@ import toastMessages from '../../constants/toastMessages';
 // Extindem TestReport pentru a include câmpuri derivate pentru sortare și afișare
 interface TestRunViewItem extends TestReport {
   status: 'Passed' | 'Failed';
-  duration: string; // Placeholder
-  endpointName: string; // Placeholder
 }
 
 type SortKey = 'testRunId' | 'createdAt' | 'status' | 'endpointName' | 'duration';
@@ -63,8 +61,6 @@ export default function TestRunsTable() {
     const mappedData: TestRunViewItem[] = testRuns.map(run => ({
       ...run,
       status: run.failedTests > 0 ? 'Failed' : 'Passed',
-      duration: 'N/A',
-      endpointName: 'N/A', // Placeholder - needs backend support
     }));
     
     let filtered = mappedData;
@@ -92,6 +88,10 @@ export default function TestRunsTable() {
     return filtered.sort((a, b) => {
       const valA = a[sortKey];
       const valB = b[sortKey];
+
+      if (valA == null && valB == null) return 0;
+      if (valA == null) return sortOrder === 'asc' ? -1 : 1;
+      if (valB == null) return sortOrder === 'asc' ? 1 : -1;
 
       if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
       if (valA > valB) return sortOrder === 'asc' ? 1 : -1;

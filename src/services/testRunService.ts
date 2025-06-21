@@ -17,6 +17,7 @@ export interface TestRunResponseItem {
   actualStatusCode: number;
   passed: boolean;
   responseBody: string;
+  duration: number;
 }
 
 export type TestRunResponse = TestRunResponseItem[];

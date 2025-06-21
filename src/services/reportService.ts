@@ -9,6 +9,8 @@ export interface TestReport {
   totalTests: number;
   passedTests: number;
   failedTests: number;
+  endpointName: string;
+  duration: number | null;
   results: TestRunResponseItem[];
 }
 

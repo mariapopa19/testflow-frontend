@@ -34,7 +34,7 @@ export default function SignUpForm() {
         name: response.name,
         picture: response.picture,
       });
-      navigate('/endpoints');
+      navigate('/dashboard');
       showToast(toastMessages.auth.registerSuccess);
     } catch (err) {
       console.error('Registration failed', err);
@@ -51,7 +51,7 @@ export default function SignUpForm() {
         name: response.name,
         picture: response.picture,
       });
-      navigate('/endpoints');
+      navigate('/dashboard');
       showToast(toastMessages.auth.registerSuccess);
     } catch (err) {
       console.error('Register failed', err);
