@@ -12,6 +12,7 @@ import TestRuns from './pages/TestRuns/TestRuns';
 import Dashboard from './pages/Dashboard/Dashboard';
 import FiveZeroZero from './pages/Error/FiveZeroZero';
 import NotFound from './pages/Error/NotFound';
+import Settings from './pages/Settings/Settings';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/" element={<AppLayout />}>
           <Route index element={<Navigate to="/dashboard" />} />
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="settings" element={<Settings />} />
           <Route path="/endpoints" element={<Endpoints />} />
           <Route path="/add-endpoint-form" element={<AddEndpoint />} />
           <Route path="/endpoints/edit/:id" element={<EditEndpointForm />} />
