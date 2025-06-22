@@ -7,6 +7,8 @@ export interface EndpointModel {
   url?: string;
   requestBodyModel?: string;
   responseBodyModel?: string;
+  headers?: Record<string, string>;
+  headersJson?: string;
 }
 
 export const getEndpoints = async (): Promise<EndpointModel[]> => {

@@ -17,6 +17,11 @@ interface AddEndpointFormProps {
   onSubmit?: (data: EndpointModel) => void;
 }
 
+interface HeaderPair {
+  key: string;
+  value: string;
+}
+
 const AddEndpointForm: React.FC<AddEndpointFormProps> = ({
   mode,
   initialData,
@@ -35,6 +40,9 @@ const AddEndpointForm: React.FC<AddEndpointFormProps> = ({
   const [responseBody, setResponseBody] = useState<string>(
     initialData?.responseBodyModel ?? '',
   );
+  const [headers, setHeaders] = useState<HeaderPair[]>([
+    { key: '', value: '' },
+  ]);
 
   const [errorRequest, setErrorRequest] = useState<boolean>(false);
   const [errorResponse, setErrorResponse] = useState<boolean>(false);
@@ -48,46 +56,59 @@ const AddEndpointForm: React.FC<AddEndpointFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (mode === 'create'){
-    let requestJson: string = '';
-    let responseJson: string = '';
-    if (requestBody !== '') {
-      requestJson = JSON.stringify(JSON.parse(requestBody));
-    }
-    if (responseBody !== '') {
-      responseJson = JSON.stringify(JSON.parse(responseBody));
-    }
 
-    try {
-      await addEndpoint({
-        name: endpointName,
-        httpMethod: selectedOption,
-        url: endpointUrl,
-        requestBodyModel: requestJson,
-        responseBodyModel: responseJson,
-      });
-      navigate('/endpoints');
-      showToast(toastMessages.endpoint.createSuccess);
-    } catch (error) {
-      showToast(toastMessages.endpoint.createError);
-      console.error('Error adding endpoint:', error);
-    }
-  } else {
-    try{
-      if (onSubmit) {
-        onSubmit( {
+    // Convert headers array to object, filtering out empty pairs
+    const headersObject: Record<string, string> = {};
+    headers.forEach((header) => {
+      if (header.key.trim() && header.value.trim()) {
+        headersObject[header.key.trim()] = header.value.trim();
+      }
+    });
+
+    if (mode === 'create') {
+      let requestJson: string = '';
+      let responseJson: string = '';
+      if (requestBody !== '') {
+        requestJson = JSON.stringify(JSON.parse(requestBody));
+      }
+      if (responseBody !== '') {
+        responseJson = JSON.stringify(JSON.parse(responseBody));
+      }
+
+      try {
+        await addEndpoint({
           name: endpointName,
           httpMethod: selectedOption,
           url: endpointUrl,
-          requestBodyModel: requestBody,
-          responseBodyModel: responseBody,
+          requestBodyModel: requestJson,
+          responseBodyModel: responseJson,
+          headers:
+            Object.keys(headersObject).length > 0 ? headersObject : undefined,
         });
         navigate('/endpoints');
+        showToast(toastMessages.endpoint.createSuccess);
+      } catch (error) {
+        showToast(toastMessages.endpoint.createError);
+        console.error('Error adding endpoint:', error);
       }
-    } catch (error) {
-      console.error('Error during form submission:', error);
-      showToast(toastMessages.endpoint.updateError);
-    }
+    } else {
+      try {
+        if (onSubmit) {
+          onSubmit({
+            name: endpointName,
+            httpMethod: selectedOption,
+            url: endpointUrl,
+            requestBodyModel: requestBody,
+            responseBodyModel: responseBody,
+            headers:
+              Object.keys(headersObject).length > 0 ? headersObject : undefined,
+          });
+          navigate('/endpoints');
+        }
+      } catch (error) {
+        console.error('Error during form submission:', error);
+        showToast(toastMessages.endpoint.updateError);
+      }
     }
   };
 
@@ -137,6 +158,27 @@ const AddEndpointForm: React.FC<AddEndpointFormProps> = ({
     }
   };
 
+  const handleHeaderChange = (
+    index: number,
+    field: 'key' | 'value',
+    value: string,
+  ) => {
+    const newHeaders = [...headers];
+    newHeaders[index][field] = value;
+    setHeaders(newHeaders);
+  };
+
+  const addHeader = () => {
+    setHeaders([...headers, { key: '', value: '' }]);
+  };
+
+  const removeHeader = (index: number) => {
+    if (headers.length > 1) {
+      const newHeaders = headers.filter((_, i) => i !== index);
+      setHeaders(newHeaders);
+    }
+  };
+
   useEffect(() => {
     if (initialData) {
       setEndpointName(initialData.name ?? '');
@@ -144,11 +186,48 @@ const AddEndpointForm: React.FC<AddEndpointFormProps> = ({
       setRequestBody(initialData.requestBodyModel ?? '');
       setResponseBody(initialData.responseBodyModel ?? '');
       setSelectedOption(initialData.httpMethod ?? '');
+      // Handle headers from either headers object or headersJson string
+      let headersToSet: HeaderPair[] = [{ key: '', value: '' }];
+
+      if (initialData.headers && Object.keys(initialData.headers).length > 0) {
+        // Use headers object if available
+        headersToSet = Object.entries(initialData.headers).map(
+          ([key, value]) => ({
+            key,
+            value,
+          }),
+        );
+      } else if (initialData.headersJson) {
+        // Parse headersJson string - it's double-encoded from the backend
+        try {
+          // First parse to get the actual JSON string
+          const jsonString = JSON.parse(initialData.headersJson);
+          // Then parse that string to get the headers object
+          const parsedHeaders = JSON.parse(jsonString);
+          if (
+            parsedHeaders &&
+            typeof parsedHeaders === 'object' &&
+            Object.keys(parsedHeaders).length > 0
+          ) {
+            headersToSet = Object.entries(parsedHeaders).map(
+              ([key, value]) => ({
+                key,
+                value: String(value),
+              }),
+            );
+          }
+        } catch (error) {
+          console.error('Error parsing headersJson:', error);
+          console.log('Raw headersJson:', initialData.headersJson);
+        }
+      }
+
+      setHeaders(headersToSet);
     }
   }, [initialData]);
 
   return (
-    <ComponentCard title="Add endpoint">
+    <ComponentCard title={mode === 'edit' ? 'Edit endpoint' : 'Add endpoint'}>
       <Form onSubmit={handleSubmit}>
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="col-span-2">
@@ -185,6 +264,51 @@ const AddEndpointForm: React.FC<AddEndpointFormProps> = ({
               hint={errorUrl ? 'Invalid URL format' : ''}
               value={endpointUrl}
             />
+          </div>
+
+          <div className="col-span-2">
+            <Label>Custom Headers</Label>
+            <div className="space-y-2">
+              {headers.map((header, index) => (
+                <div key={index} className="flex gap-2 items-center">
+                  <Input
+                    type="text"
+                    placeholder="Header name"
+                    value={header.key}
+                    onChange={(e) =>
+                      handleHeaderChange(index, 'key', e.target.value)
+                    }
+                    className="flex-1"
+                  />
+                  <Input
+                    type="text"
+                    placeholder="Header value"
+                    value={header.value}
+                    onChange={(e) =>
+                      handleHeaderChange(index, 'value', e.target.value)
+                    }
+                    className="flex-1"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => removeHeader(index)}
+                    disabled={headers.length === 1}
+                    className="px-3"
+                  >
+                    ×
+                  </Button>
+                </div>
+              ))}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={addHeader}
+                className="mt-2"
+              >
+                + Add Header
+              </Button>
+            </div>
           </div>
 
           <div className="col-span-2">

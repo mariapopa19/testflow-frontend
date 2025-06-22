@@ -37,10 +37,10 @@ export default function SingleReportView({
       <header className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
         <div>
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
-            Test Report for {report.testType}
+            Test Report for: {report.endpointName}
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Generated on{' '}
+            Test Type: {report.testType} | Generated on{' '}
             {format(new Date(report.createdAt), 'MMM dd, yyyy HH:mm:ss')}
           </p>
         </div>
@@ -116,7 +116,7 @@ export default function SingleReportView({
         </header>
 
         {openSections.includes('results') && (
-          <section className="mt-4 space-y-4 p-4 sm:p-6 border-t border-gray-100 dark:border-gray-800">
+          <section className="mt-4 space-y-4 p-4 sm:p-6 border-t border-gray-100 dark:border-gray-800 max-h-[45vh] overflow-y-auto custom-scrollbar">
             {report.results.map((result, index) => (
               <article
                 key={`${report.id}-result-${index}`}
@@ -159,6 +159,15 @@ export default function SingleReportView({
                         lineShown={5}
                       />
                     </div>
+                  </div>
+                </div>
+                {/* Secțiunea nouă pentru URL */}
+                <div className="mt-3">
+                  <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Endpoint URL
+                  </h5>
+                  <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-3 text-sm font-mono text-gray-500 dark:text-gray-400 break-all">
+                    {result.calledUrl}
                   </div>
                 </div>
 

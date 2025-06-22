@@ -18,9 +18,13 @@ export interface TestRunResponseItem {
   passed: boolean;
   responseBody: string;
   duration: number;
+  calledUrl: string;
 }
 
-export type TestRunResponse = TestRunResponseItem[];
+export interface TestRunResponse {
+  testRunId: string;
+  results: TestRunResponseItem[];
+}
 
 export const generateTestCaseValidation = async (
   endpointId: string,
