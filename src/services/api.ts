@@ -2,7 +2,9 @@ import axios from 'axios';
 import { showToast } from '../utils/toastHelper';
 import toastMessages from '../constants/toastMessages';
 
-const API_BASE_URL = process.env.VITE_API_BASE_URL ?? 'https://localhost:7049';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+console.log('All Vite env vars:', import.meta.env);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
