@@ -13,6 +13,7 @@ export const loginWithGoogle = async (
   const response = await api.post<AuthResponse>('/api/auth/google-login', {
     accessToken,
   });
+  sessionStorage.setItem('user', JSON.stringify(response.data));
   return response.data;
 };
 
@@ -22,6 +23,7 @@ export const registerWithGoogle = async (
   const response = await api.post<AuthResponse>('/api/auth/google-register', {
     accessToken,
   });
+  sessionStorage.setItem('user', JSON.stringify(response.data));
   return response.data;
 };
 
@@ -33,6 +35,7 @@ export const loginWithEmail = async (
     email,
     password,
   });
+  sessionStorage.setItem('user', JSON.stringify(response.data));
   return response.data;
 }
 
@@ -46,6 +49,7 @@ export const registerWithEmail = async (
     email,
     password,
   });
+  sessionStorage.setItem('user', JSON.stringify(response.data));
   return response.data;
 };
 

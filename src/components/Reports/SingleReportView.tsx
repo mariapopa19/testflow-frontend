@@ -5,6 +5,8 @@ import { ChevronDown, ChevronUp, Download, Trash2 } from 'lucide-react';
 import { TestReport } from '../../services/reportService';
 import { format } from 'date-fns';
 import JsonPreviewCell from '../Endpoints/JsonPreviewCell';
+import { useModal } from '../../hooks/useModal';
+import DeleteReportModal from './DeleteReportModal';
 
 interface SingleReportViewProps {
   report: TestReport;
@@ -20,6 +22,13 @@ export default function SingleReportView({
     'results',
   ]);
 
+    // Modal state for delete confirmation
+  const {
+    isOpen: isDeleteOpen,
+    openModal: openDeleteModal,
+    closeModal: closeDeleteModal,
+  } = useModal();
+
   const toggleSection = (section: string) => {
     setOpenSections((prev) =>
       prev.includes(section)
@@ -30,6 +39,15 @@ export default function SingleReportView({
 
   const handleDownloadPdf = () => {
     alert('PDF download functionality not yet implemented.');
+  };
+
+  const handleDeleteClick = () => {
+    openDeleteModal();
+  };
+
+  const confirmDelete = () => {
+    onDelete(report.id);
+    closeDeleteModal();
   };
 
   return (
@@ -53,7 +71,7 @@ export default function SingleReportView({
             size="sm"
             variant="primary"
             className="bg-red-500 hover:bg-red-600"
-            onClick={() => onDelete(report.id)}
+            onClick={handleDeleteClick}
           >
             <Trash2 className="w-4 h-4 mr-2" />
             Delete Report
@@ -198,6 +216,14 @@ export default function SingleReportView({
           </section>
         )}
       </Card>
+      
+      {/* Delete Confirmation Modal */}
+      <DeleteReportModal
+        isOpen={isDeleteOpen}
+        onClose={closeDeleteModal}
+        report={report}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }

@@ -13,7 +13,7 @@ const AppHeader: React.FC = () => {
             {/* Logo standard pentru light mode */}
             <img
               className="dark:hidden"
-              src="/images/logo/logo.svg"
+              src="/images/logo/testflow-logo-light.svg"
               alt="TestFlow Logo"
               width="120"
             />

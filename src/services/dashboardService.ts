@@ -24,9 +24,9 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
   return response.data;
 };
 
-export const getTestRunsOverTime = async (): Promise<TestRunsOverTime[]> => {
+export const getTestRunsOverTime = async (days: number): Promise<TestRunsOverTime[]> => {
   const response = await api.get<TestRunsOverTime[]>(
-    '/api/dashboard/test-runs-over-time',
+    `/api/dashboard/test-runs-over-time?days=${days}`,
   );
   return response.data;
 };

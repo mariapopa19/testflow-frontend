@@ -41,7 +41,7 @@ export default function DashboardLayout() {
             try {
                 const [statsData, runsOverTime, passFail, reports] = await Promise.all([
                     getDashboardStats(),
-                    getTestRunsOverTime(),
+                    getTestRunsOverTime(30),
                     getPassFailDistribution(),
                     getTestReports()
                 ]);

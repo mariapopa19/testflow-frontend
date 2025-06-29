@@ -45,7 +45,7 @@ const TestRunsOverTimeChart: React.FC<Props> = ({ data }) => {
     <Card>
         <div className="p-4">
             <CardTitle>Test Runs Over Time</CardTitle>
-            <CardDescription>Number of tests run in the last 7 days.</CardDescription>
+            <CardDescription>Number of tests run in the last 30 days.</CardDescription>
         </div>
       <div className="p-4">
         <Line options={options} data={chartData} />
