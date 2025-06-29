@@ -3,11 +3,14 @@ import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContex";
+import Loader from "../Loader/Loader";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, setUser } = useUser();
   const navigate = useNavigate();
+
+  if (!user) return <Loader />;
 
   function toggleDropdown() {
     setIsOpen(!isOpen);
@@ -31,7 +34,11 @@ export default function UserDropdown() {
         className="flex items-center text-gray-700 dropdown-toggle dark:text-gray-400"
       >
         <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
-          <img src={user?.picture} alt="User" />
+          <img
+            src={user.picture}
+            alt="User"
+            className="h-11 w-11 rounded-full object-cover"
+          />
         </span>
         <span className="hidden sm:block mr-1 font-medium text-theme-sm">{user?.name}</span>
         <svg
